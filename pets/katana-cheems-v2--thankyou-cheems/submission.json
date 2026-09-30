@@ -1,0 +1,25 @@
+{
+  "slug": "katana-cheems-v2--thankyou-cheems",
+  "pet_slug": "katana-cheems-v2",
+  "author_slug": "thankyou-cheems",
+  "name": "Katana Cheems v2",
+  "author": "Thankyou-Cheems",
+  "author_handle": "Thankyou-Cheems",
+  "author_url": "https://github.com/Thankyou-Cheems",
+  "primary_category": "Memes",
+  "tags": ["cheems", "samurai", "katana", "pixel-art", "native64", "v2"],
+  "source_type": "ai-generated",
+  "source_url": "https://github.com/Thankyou-Cheems/awesome-codex-pet",
+  "license": "CC BY-NC 4.0",
+  "preview_image": "../../assets/previews/katana-cheems-v2--thankyou-cheems/gifs/idle.gif",
+  "codex_install": {
+    "pet_json": "pet.json",
+    "spritesheet": "spritesheet.webp",
+    "raw_base": "https://raw.githubusercontent.com/Thankyou-Cheems/awesome-codex-pet/main"
+  },
+  "preview_assets": {
+    "contact_sheet": "../../assets/previews/katana-cheems-v2--thankyou-cheems/contact-sheet.png",
+    "gifs_dir": "../../assets/previews/katana-cheems-v2--thankyou-cheems/gifs"
+  },
+  "spritesheet_sha256": "a6c537d54e6882bb9709e735dd3bf3ef8ca7c755944f837a91b1ac0f57153578"
+}

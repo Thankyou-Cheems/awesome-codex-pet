@@ -96,8 +96,9 @@ function authorLink(pet) {
   return `@${handle}`;
 }
 
-function bashInstallCommand(slug) {
-  return `curl -fsSL ${rawBase}/scripts/install-pet.sh | bash -s -- ${slug}`;
+function bashInstallCommand(slug, installRawBase = rawBase) {
+  const prefix = installRawBase === rawBase ? "" : `AWESOME_CODEX_PET_RAW_BASE=${installRawBase} `;
+  return `curl -fsSL ${installRawBase}/scripts/install-pet.sh | ${prefix}bash -s -- ${slug}`;
 }
 
 function powershellInstallCommand(slug) {
@@ -119,7 +120,7 @@ function petBlock(pet, lang) {
   return [
     `<table>`,
     `<tr><th>${labels[0]}</th><td colspan="5"><a href="${rootPrefix}/pets/${pet.slug}">${pet.name}</a> · ${by} ${authorLink(pet)} · ${categoryName}</td></tr>`,
-    `<tr><th>${labels[1]}</th><td colspan="5"><code>${bashInstallCommand(pet.slug)}</code></td></tr>`,
+    `<tr><th>${labels[1]}</th><td colspan="5"><code>${bashInstallCommand(pet.slug, pet.codex_install?.raw_base)}</code></td></tr>`,
     `<tr><th>${labels[2]}</th>${stateNames.map((name) => `<td><strong>${name}</strong></td>`).join("")}</tr>`,
     `<tr><th>${labels[3]}</th>${gifs.map((gif) => `<td>${gif}</td>`).join("")}</tr>`,
     `</table>`,

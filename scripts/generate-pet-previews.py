@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import json
 from pathlib import Path
 
 from PIL import Image, ImageChops, ImageDraw, ImageFilter, ImageFont
@@ -148,23 +149,28 @@ def make_contact_sheet(atlas: Image.Image, output: Path, scale: float = 0.5) -> 
     cell_w = max(1, round(CELL_WIDTH * scale))
     cell_h = max(1, round(CELL_HEIGHT * scale))
     width = COLUMNS * cell_w
-    height = ROWS * (cell_h + LABEL_HEIGHT)
+    atlas_rows = atlas.height // CELL_HEIGHT
+    height = atlas_rows * (cell_h + LABEL_HEIGHT)
     sheet = Image.new("RGB", (width, height), "#f7f7f7")
     draw = ImageDraw.Draw(sheet)
     font = ImageFont.load_default()
 
-    for state, row, durations in STATES:
+    rows = [(state, row, len(durations)) for state, row, durations in STATES]
+    if atlas_rows == 11:
+        rows.extend([("look: 0–157.5 degrees clockwise", 9, 8), ("look: 180–337.5 degrees clockwise", 10, 8)])
+
+    for state, row, frame_count in rows:
         y = row * (cell_h + LABEL_HEIGHT)
         draw.rectangle((0, y, width, y + LABEL_HEIGHT - 1), fill="#111111")
         draw.text((6, y + 5), f"row {row}: {state}", fill="#ffffff", font=font)
-        draw.text((width - 92, y + 5), f"{len(durations)} frames", fill="#ffffff", font=font)
+        draw.text((width - 92, y + 5), f"{frame_count} frames", fill="#ffffff", font=font)
 
         for column in range(COLUMNS):
             frame = frame_with_background(atlas, row, column)
-            frame = frame.resize((cell_w, cell_h), Image.Resampling.LANCZOS)
+            frame = frame.resize((cell_w, cell_h), Image.Resampling.NEAREST)
             x = column * cell_w
             sheet.paste(frame, (x, y + LABEL_HEIGHT))
-            outline = "#18a058" if column < len(durations) else "#cc3344"
+            outline = "#18a058" if column < frame_count else "#cc3344"
             draw.rectangle(
                 (x, y + LABEL_HEIGHT, x + cell_w - 1, y + LABEL_HEIGHT + cell_h - 1),
                 outline=outline,
@@ -220,7 +226,12 @@ def generate_for_pet(pet_dir: Path) -> None:
     with Image.open(spritesheet) as opened:
         atlas = opened.convert("RGBA")
 
-    expected_size = (COLUMNS * CELL_WIDTH, ROWS * CELL_HEIGHT)
+    manifest = json.loads((pet_dir / "pet.json").read_text(encoding="utf-8"))
+    version = manifest.get("spriteVersionNumber", 1)
+    if version not in (1, 2):
+        raise ValueError(f"{pet_dir / 'pet.json'} has unsupported spriteVersionNumber: {version}")
+    atlas_rows = 11 if version == 2 else ROWS
+    expected_size = (COLUMNS * CELL_WIDTH, atlas_rows * CELL_HEIGHT)
     if atlas.size != expected_size:
         raise ValueError(f"{spritesheet} must be {expected_size[0]}x{expected_size[1]}, got {atlas.size[0]}x{atlas.size[1]}")
 
